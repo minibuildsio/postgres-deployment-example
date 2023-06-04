@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-pg-deployment
+  namespace: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-pg-deployment
+  template:
+    metadata:
+      labels:
+        app: db-pg-deployment
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+          - configMapRef:
+              name: db-pg-cm
+        env:
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-pg-secret
+                key: password
+        ports:
+          - containerPort: 5432
+        volumeMounts:
+          - name: db-volume
+            mountPath: /var/lib/postgresql/data
+            subPath: postgres
+        resources:
+            limits:
+              memory: "256Mi"
+              cpu: "1"
+            requests:
+              memory: "32Mi"
+              cpu: "0m"
+      volumes:
+        - name: db-volume
+          persistentVolumeClaim:
+            claimName: db-pvc

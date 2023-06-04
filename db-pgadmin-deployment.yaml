@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-pgadmin-deployment
+  namespace: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-pgadmin-deployment
+  template:
+    metadata:
+      labels:
+        app: db-pgadmin-deployment
+    spec:
+      containers:
+      - name: pgadmin
+        image: dpage/pgadmin4
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+          - configMapRef:
+              name: db-pgadmin-cm
+        env:
+          - name: PGADMIN_DEFAULT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-pgadmin-secret
+                key: password
+        ports:
+          - containerPort: 5050
+        resources:
+            limits:
+              memory: "256Mi"
+              cpu: "1"
+            requests:
+              memory: "32Mi"
+              cpu: "0m"

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-pgadmin-cm
+  namespace: db
+data:
+  PGADMIN_DEFAULT_EMAIL: admin@admin.com
